@@ -4,7 +4,10 @@ class BuilderException(Exception):
 	pass
 
 class BaseBuilder(object):
-	""" Builders base class, defines all pipelined operators, input/output properties and their evaulation. """
+	"""
+	Base class for all builders.
+	Defines all pipelined operators, input/output properties and their evaulation.
+	"""
 	_input  = None
 	_output = None
 	def __init__(self, *files, **kwargs):
@@ -20,13 +23,18 @@ class BaseBuilder(object):
 
 	@property
 	def output(self):
-		""" Evaluates builder and fills it's output. Runs once, every other run will return result of the first run. """ 
+		"""
+		Evaluates builder (runs it's :py:meth:`build` function) and returns it's output.
+		Runs once, every other run will return result of the first run.
+		""" 
 		if self._output is None:
 			self._output = self.build()
 		return self._output
 
 	def get_cwd(self):
-		""" Returns current working directory. """
+		"""
+		Returns current working directory.
+		"""
 		return os.getcwd()
 
 	def __lt__(self, receiver):
@@ -34,7 +42,10 @@ class BaseBuilder(object):
 
 	def __gt__(self, receiver):
 		"""
-		`builder > 'output.ext'`
+		Usage::
+		
+			builder > 'output.ext'
+
 		Finalizes builder and saves builder output to 'output.ext'.
 		"""
 		#print 'saving to %s' % receiver
@@ -44,7 +55,10 @@ class BaseBuilder(object):
 
 	def __or__(self, receiver):
 		"""
-		`builder1 | builder2`
+		Builders conveyer. Usage::
+
+			builder1 | builder2
+		
 		Pushes builder1 output to builder2 input.
 		"""
 		receiver.input = self.output
@@ -52,7 +66,10 @@ class BaseBuilder(object):
 
 	def __and__(self, other):
 		"""
-		`builder1 & builder2`
+		Builders concatenator. Usage::
+
+			builder1 & builder2
+
 		Creates new builder, pushing builder1 and builder2 output concatenated (in that order) to new builders input.
 		"""
 		concatBuilder = BaseBuilder()
@@ -64,7 +81,10 @@ class BaseBuilder(object):
 
 	def __xor__(self, other):
 		"""
-		`builder1 ^ builder2`
+		Builders sequental 'forgetter'. Usage::
+
+			builder1 ^ builder2
+
 		Forgets output of builder1, returns builder.
 		"""
 		return other
