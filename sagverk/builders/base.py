@@ -1,4 +1,4 @@
-import os
+import os, glob
 
 class BuilderException(Exception):
 	pass
@@ -10,8 +10,22 @@ class BaseBuilder(object):
 	"""
 	_input  = None
 	_output = None
+	_files  = []
 	def __init__(self, *files, **kwargs):
 		self.files = files
+		if kwargs:
+			# process orderings
+			pass
+
+	@property
+	def files(self):
+		for entry in self._files:
+			for _entry in glob.glob(entry):
+				yield _entry
+
+	@files.setter
+	def files(self, value):
+		self._files = value
 
 	@property
 	def input(self):
