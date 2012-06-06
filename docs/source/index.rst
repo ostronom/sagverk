@@ -21,11 +21,9 @@ Predefined simple builders.
 .. automodule:: sagverk.builders.simple
    :members:
 
-################################
-sagverk.builders.contrib classes
-################################
+####################################
+sagverk.builders.contrib.css classes
+####################################
 
-Builders, that use third-party applications.
-
-.. automodule:: sagverk.builders.contrib
+.. automodule:: sagverk.builders.contrib.css
    :members:
