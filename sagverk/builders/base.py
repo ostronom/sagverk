@@ -1,4 +1,4 @@
-import os, glob
+import os, glob, re
 
 class BuilderException(Exception):
 	pass
@@ -8,24 +8,38 @@ class BaseBuilder(object):
 	Base class for all builders.
 	Defines all pipelined operators, input/output properties and their evaulation.
 	"""
+	_cwd    = None
 	_input  = None
 	_output = None
-	_files  = []
+	_files  = None
+	_order  = None
 	def __init__(self, *files, **kwargs):
-		self.files = files
-		if kwargs:
-			# process orderings
-			pass
+		self.files  = files
+		self._cwd   = kwargs.get('cwd')
+		self.order  = kwargs.get('order')
+		self.kwargs = kwargs
 
 	@property
 	def files(self):
-		for entry in self._files:
-			for _entry in glob.glob(entry):
-				yield _entry
+		res = []
+		for pattern in self._files:
+			res.extend(list(glob.glob(pattern)))
+		if self._order:
+			res.sort(key=lambda w: sum([int(pat.search(w) is not None) * weight for weight, pat in self.order]), reverse=True)
+		return res
 
 	@files.setter
 	def files(self, value):
 		self._files = value
+
+	@property
+	def order(self):
+		return self._order
+
+	@order.setter
+	def order(self, patterns):
+		if patterns is not None:
+			self._order = [(2**num, re.compile(pat)) for num, pat in enumerate(patterns)]
 
 	@property
 	def input(self):
@@ -45,11 +59,15 @@ class BaseBuilder(object):
 			self._output = self.build()
 		return self._output
 
-	def get_cwd(self):
+	@property
+	def cwd(self):
 		"""
 		Returns current working directory.
 		"""
-		return os.getcwd()
+		if self._cwd is None:
+			return os.getcwd()
+		else:
+			return self._cwd
 
 	def __lt__(self, receiver):
 		raise NotImplemented, 'No injecting yet'
@@ -63,7 +81,7 @@ class BaseBuilder(object):
 		Finalizes builder and saves builder output to 'output.ext'.
 		"""
 		#print 'saving to %s' % receiver
-		with open(receiver, 'w') as f:
+		with open(os.path.abspath(receiver), 'w') as f:
 			f.write(self.output)
 		return self
 
@@ -108,4 +126,4 @@ class BaseBuilder(object):
 		Builders's build method --- defines builder's behaviour.
 		Should return 'string' output which will be set to output property of builder.
 		"""
-		pass
+		return self.input

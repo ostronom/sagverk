@@ -1,4 +1,4 @@
-from builders.simple import ShellBuilder, ConcatFilesBuilder
+from sagverk.builders.simple import ShellBuilder, ConcatFilesBuilder
 
 class CoffeeScriptBuilder(ShellBuilder):
     """ Compiles input via coffee compiler. """
@@ -14,6 +14,7 @@ class ClosureCompiler(ShellBuilder):
     def get_command_args(self):
         return [
             '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+            '--logging_level', 'ALL',
             '--process_jquery_primitives'
         ]
     def get_proc_input(self):

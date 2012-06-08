@@ -13,3 +13,17 @@ class YUICompressor(ShellBuilder):
         return self.input
     def get_command_args(self):
         return ['--type', 'css']
+
+class SASSBuilder(ShellBuilder):
+    """ Compiles given input via SASS compiler. """
+    command = 'sass'
+    def get_proc_input(self):
+        return self.input
+    def get_command_args(self):
+        return ['--stdin' , '--compass', '--scss']
+
+class CompassBuilder(ShellBuilder):
+    """ ... """
+    command = 'compass'
+    def get_command_args(self):
+        return ['compile']
